@@ -10,6 +10,40 @@ use Exporter ();
 use Params::Util qw(_CLASS _CLASSISA);
 use Sub::Exporter ();
 
+=head1 SYNOPSIS
+
+  use Sub::Import 'Some::Library' => (
+    some_routine  => { -as => 'some_other_name' },
+    other_routine => undef,
+  );
+
+=head1 DESCRIPTION
+
+Sub::Import is the companion to Sub::Exporter.  You can use Sub::Import to get
+Sub::Exporter-like import semantics, even if the library you're importing from
+used Exporter.pm.
+
+The synopsis above should say it all.  Where you would usually say:
+
+  use Some::Library qw(foo bar baz);
+
+...to get Exporter.pm semantics, you can now get Sub::Exporter semantics with:
+
+  use Sub::Import 'Some::Library' => qw(foo bar baz);
+
+=head1 WARNINGS AND LIMITATIONS
+
+While you can rename imports, there is no way to customize them, because they
+are not being built by generators.  At present, extra arguments for each import
+will be thrown away.  In the future, they may become a fatal error.
+
+Non-subroutine imports will not be importable via this mechanism.
+
+The regex-like import features of Exporter.pm will be unavailable.  (Will
+anyone miss them?)
+
+=cut
+
 sub import {
   my ($self, $target, @args) = @_;
 
@@ -104,6 +138,12 @@ sub _create_methods {
   }
 }
 
+sub __filter_subs {
+  my ($self, $exports) = @_;
+
+  @$exports = map { s/\A&//; $_ } grep { /\A[&_a-z]/ } @$exports;
+}
+
 sub _create_methods_exporter {
   my ($self, $target) = @_;
 
@@ -112,6 +152,8 @@ sub _create_methods_exporter {
   my @ok      = @{ $target . "::EXPORT_OK"  };
   my @default = @{ $target . "::EXPORT"     };
   my %groups  = %{ $target . "::EXPORT_TAG" };
+
+  $self->__filter_subs($_) for (\@ok, \@default, values %groups);
 
   my @all = do {
     my %seen;
