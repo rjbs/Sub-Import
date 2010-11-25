@@ -1,0 +1,4 @@
+Revision history for {{$dist->name}}
+
+{{$NEXT}}
+          groups are in EXPORT_TAGS not EXPORT_TAG

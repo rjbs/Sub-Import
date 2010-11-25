@@ -149,9 +149,9 @@ sub _create_methods_exporter {
 
   no strict 'refs';
 
-  my @ok      = @{ $target . "::EXPORT_OK"  };
-  my @default = @{ $target . "::EXPORT"     };
-  my %groups  = %{ $target . "::EXPORT_TAG" };
+  my @ok      = @{ $target . "::EXPORT_OK"   };
+  my @default = @{ $target . "::EXPORT"      };
+  my %groups  = %{ $target . "::EXPORT_TAGS" };
 
   $self->__filter_subs($_) for (\@ok, \@default, values %groups);
 
