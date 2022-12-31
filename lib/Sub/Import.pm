@@ -17,6 +17,24 @@ use Sub::Exporter ();
     other_routine => undef,
   );
 
+Some more examples:
+
+  # import a function with a custom name
+  use Sub::Import 'Digest::MD5', md5_hex => {-as => 'md5sum'};
+
+  # import multiple functions, each with its own name
+  use Sub::Import 'MIME::Base64',
+    encode_base64 => {-as => 'e64'},
+    decode_base64 => {-as => 'd64'};
+
+  # Import most functions with the "trig_" prefix, e.g. "trig_log",
+  # "trig_sin", "trig_cos", etc.
+  use Sub::Import 'Math::Trig', -all => {-prefix => 'trig_'};
+
+  # Import PI-related functions with the "_the_great" suffix, e.g.
+  # "pi_the_great", "pi2_the_great", etc.
+  use Sub::Import 'Math::Trig', -pi  => {-suffix => '_the_great'};
+
 =head1 DESCRIPTION
 
 Sub::Import is the companion to Sub::Exporter.  You can use Sub::Import to get
@@ -111,7 +129,7 @@ my $EXPORTER_IMPORT;
 BEGIN { $EXPORTER_IMPORT = Exporter->can('import'); }
 sub _is_exporterrific {
   my ($self, $class) = @_;
-  
+
   my $class_import = do {
     local $@;
     eval { $class->can('import') };
